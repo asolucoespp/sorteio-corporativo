@@ -2,16 +2,17 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<title>Sorteio FlyTour</title>
+<title>Sorteio Corporativo</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <style>
 :root{
-  --bg:#0f1115;
-  --card:#171a21;
-  --text:#ffffff;
-  --muted:#9aa0a6;
+  --bg:#f2f4f7;
+  --card:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
   --accent:#2563eb;
+  --danger:#dc2626;
 }
 
 *{box-sizing:border-box}
@@ -20,17 +21,17 @@ html,body{
   margin:0;
   height:100%;
   font-family: Inter, Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
+  background:var(--bg);
+  color:var(--text);
 }
 
 .wrap{
   max-width:1200px;
-  margin:20px auto;
+  margin:24px auto;
   background:var(--card);
-  border-radius:16px;
+  border-radius:18px;
   padding:24px;
-  box-shadow:0 20px 60px rgba(0,0,0,.6);
+  box-shadow:0 20px 50px rgba(0,0,0,.12);
 }
 
 /* HEADER */
@@ -38,20 +39,30 @@ html,body{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:20px;
+  margin-bottom:24px;
 }
 
 .logos{
   display:flex;
-  gap:16px;
+  gap:18px;
   align-items:center;
+  background:#ffffff;
+  padding:12px 18px;
+  border-radius:14px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.06);
 }
+
 .logos img{
-  height:36px;
+  height:40px;
   object-fit:contain;
 }
 
-/* ROLETA */
+.title{
+  font-size:20px;
+  font-weight:700;
+}
+
+/* LAYOUT */
 .roleta-area{
   display:flex;
   gap:40px;
@@ -60,8 +71,9 @@ html,body{
   flex-wrap:wrap;
 }
 
+/* CANVAS */
 canvas{
-  background:#0b0e14;
+  background:#f9fafb;
   border-radius:50%;
 }
 
@@ -75,14 +87,14 @@ canvas{
 
 select,button,textarea{
   padding:14px;
-  border-radius:10px;
-  border:none;
+  border-radius:12px;
+  border:1px solid #e5e7eb;
   font-size:14px;
 }
 
 select,textarea{
-  background:#0b1220;
-  color:#fff;
+  background:#ffffff;
+  color:var(--text);
 }
 
 button{
@@ -90,32 +102,41 @@ button{
   color:#fff;
   font-weight:600;
   cursor:pointer;
+  border:none;
 }
 
-button.secondary{ background:#1f2937; }
-button.danger{ background:#7f1d1d; }
+button.secondary{
+  background:#f3f4f6;
+  color:#111827;
+}
+
+button.danger{
+  background:var(--danger);
+  color:#fff;
+}
 
 /* RESULTADO */
 #resultado{
-  font-size:32px;
+  font-size:34px;
   font-weight:800;
   text-align:center;
-  margin:28px 0;
+  margin:32px 0 16px;
 }
 
 /* GANHADORES */
 .winner{
   padding:10px;
-  border-bottom:1px solid rgba(255,255,255,.06);
+  border-bottom:1px solid #e5e7eb;
   display:flex;
   justify-content:space-between;
+  font-size:14px;
 }
 
 /* MODAL */
 .modal{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.75);
+  background:rgba(0,0,0,.6);
   display:none;
   align-items:center;
   justify-content:center;
@@ -123,16 +144,16 @@ button.danger{ background:#7f1d1d; }
 }
 
 .modal-content{
-  background:#171a21;
+  background:#ffffff;
   padding:24px;
-  border-radius:14px;
+  border-radius:16px;
   width:95%;
   max-width:760px;
 }
 
 .modal-content label{
   display:block;
-  margin-top:14px;
+  margin-top:16px;
   font-size:13px;
   color:var(--muted);
 }
@@ -141,7 +162,7 @@ button.danger{ background:#7f1d1d; }
   display:flex;
   justify-content:flex-end;
   gap:12px;
-  margin-top:20px;
+  margin-top:24px;
 }
 </style>
 </head>
@@ -150,26 +171,27 @@ button.danger{ background:#7f1d1d; }
 
 <div class="wrap">
 
+  <!-- HEADER -->
   <div class="header">
     <div class="logos">
-      <!-- AJUSTE O CAMINHO SE NECESSÁRIO -->
       <img src="./assets/accor.png" alt="Accor">
       <img src="./assets/aircanada.png" alt="Air Canada">
       <img src="./assets/avianca.png" alt="Avianca">
       <img src="./assets/flytour.png" alt="Flytour">
     </div>
-    <strong>Sorteio Corporativo</strong>
+    <div class="title">Sorteio Corporativo</div>
   </div>
 
+  <!-- ROLETA -->
   <div class="roleta-area">
     <canvas id="wheel" width="560" height="560"></canvas>
 
     <div class="controls">
       <select id="selectItem"></select>
-      <button id="btnGirar">Girar roleta</button>
+      <button id="btnGirar">🎯 Girar roleta</button>
 
       <button id="btnConfig" class="secondary">⚙ Configurar</button>
-      <button id="btnReset" class="danger">🔄 Resetar sorteio</button>
+      <button id="btnReset" class="danger">🔄 Resetar ganhadores</button>
       <button id="btnExport" class="secondary">💾 Exportar CSV</button>
     </div>
   </div>
@@ -181,7 +203,7 @@ button.danger{ background:#7f1d1d; }
 <!-- MODAL CONFIG -->
 <div id="modal" class="modal">
   <div class="modal-content">
-    <h3>Configuração</h3>
+    <h3>Configuração do Sorteio</h3>
 
     <label>Participantes (1 por linha)</label>
     <textarea id="cfgNames" rows="6"></textarea>
@@ -212,7 +234,7 @@ const radius = center - 20;
 let anguloAtual = 0;
 const cores = ["#2563eb","#9333ea","#16a34a","#ea580c","#dc2626","#0d9488"];
 
-/* ================= ROLETA ================= */
+/* ================= DESENHO ================= */
 function desenharRoleta(){
   const total = participantes.length || 1;
   const ang = (2*Math.PI)/total;
@@ -229,7 +251,7 @@ function desenharRoleta(){
     ctx.save();
     ctx.translate(center, center);
     ctx.rotate(i*ang + ang/2);
-    ctx.fillStyle="#fff";
+    ctx.fillStyle="#ffffff";
     ctx.font="bold 18px Arial";
     ctx.fillText(nome, radius * 0.55, 6);
     ctx.restore();
@@ -237,11 +259,11 @@ function desenharRoleta(){
 }
 
 function desenharPonteiro(){
-  ctx.fillStyle="#fff";
+  ctx.fillStyle="#111827";
   ctx.beginPath();
-  ctx.moveTo(center, 10);
-  ctx.lineTo(center - 14, 40);
-  ctx.lineTo(center + 14, 40);
+  ctx.moveTo(center, 8);
+  ctx.lineTo(center - 14, 42);
+  ctx.lineTo(center + 14, 42);
   ctx.closePath();
   ctx.fill();
 }
@@ -263,7 +285,7 @@ function renderSelectItems(){
 /* ================= SORTEIO ================= */
 document.getElementById("btnGirar").onclick = ()=>{
   if(!participantes.length || !itens.length){
-    alert("Configure o sorteio");
+    alert("Configure o sorteio primeiro.");
     return;
   }
 
@@ -271,10 +293,8 @@ document.getElementById("btnGirar").onclick = ()=>{
   if(item.qtd === 0) return;
 
   const DURATION = 3000;
-  const MIN_SPINS = 5;
-
   const inicio = anguloAtual;
-  const fim = inicio + (MIN_SPINS*360) + Math.random()*360;
+  const fim = inicio + (5*360) + Math.random()*360;
   let start = null;
 
   function animar(ts){
@@ -299,7 +319,6 @@ document.getElementById("btnGirar").onclick = ()=>{
       finalizar(item);
     }
   }
-
   requestAnimationFrame(animar);
 };
 
@@ -312,13 +331,13 @@ function finalizar(item){
 
   vencedores.push({
     nome,
-    item: item.nome,
-    data: new Date().toLocaleString("pt-BR")
+    item:item.nome,
+    data:new Date().toLocaleString("pt-BR")
   });
 
   document.getElementById("resultado").textContent = nome;
 
-  saveState();
+  salvar();
   renderSelectItems();
   renderWinners();
   desenharRoleta();
@@ -342,8 +361,7 @@ function saveConfig(){
   });
 
   vencedores = [];
-  saveState();
-
+  salvar();
   renderSelectItems();
   renderWinners();
   desenharRoleta();
@@ -356,7 +374,7 @@ document.getElementById("btnReset").onclick = ()=>{
   if(confirm("Deseja limpar apenas os ganhadores?")){
     vencedores = [];
     participantes = [...baseParticipantes];
-    saveState();
+    salvar();
     renderWinners();
     renderSelectItems();
     desenharRoleta();
@@ -373,7 +391,7 @@ function renderWinners(){
   ).join("");
 }
 
-function saveState(){
+function salvar(){
   localStorage.setItem("baseParticipants",JSON.stringify(baseParticipantes));
   localStorage.setItem("participants",JSON.stringify(participantes));
   localStorage.setItem("items",JSON.stringify(itens));
