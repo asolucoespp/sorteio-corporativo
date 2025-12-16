@@ -1,2 +1,0 @@
-# sorteio-corporativo
-Sorteio Corporativo
