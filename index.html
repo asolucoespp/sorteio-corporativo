@@ -1,258 +1,426 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sorteio Corporativo</title>
-  <style>
-    :root {
-      --bg1: #ffffff; /* Cor de fundo clara */
-      --bg2: #f1f1f1; /* Cor de fundo alternativa */
-      --card: #ffffff;
-      --accent: #4CAF50;
-      --accent-hover: #45a049;
-      --muted: #8c8c8c;
-      --text: #333;
-      --text-secondary: #555;
-      --select-bg: #e0e0e0;
-      --select-border: rgba(255,255,255,0.07);
-    }
+<meta charset="utf-8">
+<title>Sorteio Corporativo</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      background-color: var(--bg1);
-      color: var(--text);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-    }
+<style>
+:root{
+  --bg:#f2f4f7;
+  --card:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --accent:#2563eb;
+  --danger:#dc2626;
+}
 
-    .wrap {
-      max-width: 1200px;
-      margin: 18px auto;
-      height: calc(100vh - 36px);
-      background: var(--bg2);
-      border-radius: 12px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
+*{box-sizing:border-box}
 
-    /* Top: big spinning name */
-    .top {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      background: var(--bg2);
-    }
+html,body{
+  margin:0;
+  height:100%;
+  font-family: Inter, Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
 
-    #bigName {
-      font-weight: 800;
-      font-size: clamp(36px, 8vw, 96px);
-      letter-spacing: 0.6px;
-      transition: transform 400ms cubic-bezier(.2, .9, .2, 1);
-      user-select: none;
-      padding: 6px 18px;
-      border-radius: 10px;
-      text-align: center;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.0));
-    }
+.wrap{
+  max-width:1200px;
+  margin:24px auto;
+  background:var(--card);
+  border-radius:18px;
+  padding:24px;
+  box-shadow:0 20px 50px rgba(0,0,0,.12);
+}
 
-    .infoTop {
-      position: absolute;
-      left: 18px;
-      top: 14px;
-      font-size: 13px;
-      color: var(--muted);
-      background: rgba(0, 0, 0, 0.6);
-      padding: 8px 10px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:24px;
+}
 
-    .spinning {
-      animation: spinText 120ms linear infinite;
-    }
+.logos{
+  display:flex;
+  gap:18px;
+  align-items:center;
+  background:#ffffff;
+  padding:12px 18px;
+  border-radius:14px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.06);
+}
 
-    @keyframes spinText {
-      0% { transform: rotate(0deg) scale(1.02); }
-      50% { transform: rotate(6deg) scale(1.03); }
-      100% { transform: rotate(0deg) scale(1.02); }
-    }
+/* ✅ PADRONIZAÇÃO DOS LOGOS (ÚNICO AJUSTE) */
+.logos img{
+  height:42px;          /* tamanho padrão */
+  width:auto;
+  object-fit:contain;
+  background:transparent;
+}
 
-    /* Imagens dos logos */
-    .sponsor-logo {
-      width: 150px; /* Tamanho padrão para as imagens */
-      height: auto; /* Mantém a proporção */
-      margin: 10px;
-    }
+.title{
+  font-size:20px;
+  font-weight:700;
+}
 
-    /* Bottom controls + winners */
-    .bottom {
-      height: 42%;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+/* LAYOUT */
+.roleta-area{
+  display:flex;
+  gap:40px;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+}
 
-    .controls {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+/* CANVAS */
+canvas{
+  background:#f9fafb;
+  border-radius:50%;
+}
 
-    .selectItem {
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--select-border);
-      font-weight: 700;
-      background: var(--select-bg);
-      color: var(--text);
-      min-width: 260px;
-    }
+/* CONTROLES */
+.controls{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  min-width:300px;
+}
 
-    .btn {
-      background: linear-gradient(180deg, var(--accent), #b20710);
-      color: white;
-      border: none;
-      padding: 14px 28px;
-      font-weight: 800;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
-      transition: all 0.2s ease;
-    }
+select,button,textarea{
+  padding:14px;
+  border-radius:12px;
+  border:1px solid #e5e7eb;
+  font-size:14px;
+}
 
-    .btn:hover {
-      background: linear-gradient(180deg, var(--accent-hover), #c00);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(229, 9, 20, 0.4);
-    }
+select,textarea{
+  background:#ffffff;
+  color:var(--text);
+}
 
-    .btn[disabled] {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
+button{
+  background:var(--accent);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  border:none;
+}
 
-    /* WINNERS: C-2 layout — grid of compact cards com informações em linha */
-    .winnersArea {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 12px;
-      align-items: start;
-      padding: 6px;
-      overflow: auto;
-      width: 100%;
-    }
+button.secondary{
+  background:#f3f4f6;
+  color:#111827;
+}
 
-    .winner-card {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.22));
-      border-radius: 10px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      min-height: 68px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
-      border: 1px solid rgba(255,255,255,0.04);
-      transition: transform .15s ease, box-shadow .15s ease;
-    }
+button.danger{
+  background:var(--danger);
+  color:#fff;
+}
 
-    .winner-card:hover { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(0,0,0,0.6); }
+/* RESULTADO */
+#resultado{
+  font-size:34px;
+  font-weight:800;
+  text-align:center;
+  margin:32px 0 16px;
+}
 
-    .wc-top { display:flex; justify-content:space-between; align-items:center; gap:8px; }
-    .wc-name { font-weight:800; font-size:15px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .wc-meta { font-size:12px; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:60%; text-align:right; }
-    .wc-bottom { display:flex; justify-content:space-between; align-items:center; gap:8px; }
-    .wc-dept { font-size:13px; color:var(--text-secondary); }
-    .wc-item { font-weight:700; font-size:13px; color:var(--text); text-align:right; }
+/* GANHADORES */
+.winner{
+  padding:10px;
+  border-bottom:1px solid #e5e7eb;
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+}
 
-    /* Export and Reset buttons */
-    .action-buttons {
-      position: fixed;
-      right: 14px;
-      bottom: 12px;
-      display: flex;
-      gap: 8px;
-      z-index: 200;
-    }
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+}
 
-    .action-btn {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--muted);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 6px 10px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      opacity: 0.7;
-      transition: all 0.2s ease;
-    }
+.modal-content{
+  background:#ffffff;
+  padding:24px;
+  border-radius:16px;
+  width:95%;
+  max-width:760px;
+}
 
-    .action-btn:hover {
-      opacity: 1;
-      color: var(--text);
-      background: rgba(255, 255, 255, 0.1);
-      transform: translateY(-2px);
-    }
+.modal-content label{
+  display:block;
+  margin-top:16px;
+  font-size:13px;
+  color:var(--muted);
+}
 
-    .action-btn[disabled] {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-  </style>
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:12px;
+  margin-top:24px;
+}
+</style>
 </head>
+
 <body>
-  <div class="wrap" role="application" aria-label="App de sorteio">
-    <div class="top">
-      <div class="infoTop" id="infoTop">Carregando...</div>
-      <div id="bigName">Clique em Sortear</div>
+
+<div class="wrap">
+
+  <div class="header">
+    <div class="logos">
+      <img src="./assets/accor.png" alt="Accor">
+      <img src="./assets/aircanada.png" alt="Air Canada">
+      <img src="./assets/avianca.png" alt="Avianca">
+      <img src="./assets/flytour.png" alt="Flytour">
     </div>
-    <div class="bottom">
-      <div class="controls" aria-hidden="false">
-        <select id="selectBlock" class="selectSmall" title="Escolha o bloco do sorteio">
-          <option value="1">Bloco 1</option>
-          <option value="2">Bloco 2</option>
-        </select>
+    <div class="title">Sorteio Corporativo</div>
+  </div>
 
-        <select id="selectItem" class="selectItem" title="Escolha o item a sortear"></select>
+  <div class="roleta-area">
+    <canvas id="wheel" width="560" height="560"></canvas>
 
-        <input id="batchCount" class="batch-input" type="number" min="1" max="10" value="1" title="Quantidade por sorteio (máx 10)">
+    <div class="controls">
+      <select id="selectItem"></select>
+      <button id="btnGirar">🎯 Girar roleta</button>
 
-        <button id="btnSortear" class="btn">🎁 Sortear</button>
-      </div>
-
-      <div class="winnersArea" id="winnersArea" aria-live="polite" aria-atomic="true"></div>
+      <button id="btnConfig" class="secondary">⚙ Configurar</button>
+      <button id="btnReset" class="danger">🔄 Resetar ganhadores</button>
+      <button id="btnExport" class="secondary">💾 Exportar CSV</button>
     </div>
   </div>
 
-  <!-- Botão Reset Discreto para Testes -->
-  <button id="btnResetTest" class="btn-reset-test" title="Resetar Sorteio (Área de Testes)">🔄 Reset Teste</button>
+  <div id="resultado">Aguardando sorteio</div>
+  <div id="winners"></div>
+</div>
 
-  <!-- Botão Config (Opção A: canto inferior esquerdo) -->
-  <button id="btnConfig" class="btn-config" title="Configurar bases">⚙️ Configurar</button>
+<!-- MODAL CONFIG -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <h3>Configuração do Sorteio</h3>
 
-  <div class="action-buttons">
-    <button id="exportBtn" class="action-btn" title="Exportar ganhadores">💾 Exportar CSV</button>
+    <label>Participantes (1 por linha)</label>
+    <textarea id="cfgNames" rows="6"></textarea>
+
+    <label>Itens (Item;Quantidade)</label>
+    <textarea id="cfgItems" rows="5"></textarea>
+
+    <div class="modal-actions">
+      <button onclick="closeModal()" class="secondary">Cancelar</button>
+      <button onclick="saveConfig()">Salvar</button>
+    </div>
   </div>
+</div>
 
-  <script>
-    // Código JavaScript para controle do sorteio, botão de reset, exportação e outros.
-  </script>
+<script>
+/* ================= ESTADO ================= */
+let baseParticipantes = JSON.parse(localStorage.getItem("baseParticipants")) || [];
+let participantes = JSON.parse(localStorage.getItem("participants")) || [];
+let itens = JSON.parse(localStorage.getItem("items")) || [];
+let vencedores = JSON.parse(localStorage.getItem("winners")) || [];
+
+/* ================= CANVAS ================= */
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
+const center = canvas.width / 2;
+const radius = center - 20;
+
+let anguloAtual = 0;
+const cores = ["#2563eb","#9333ea","#16a34a","#ea580c","#dc2626","#0d9488"];
+
+/* ================= DESENHO ================= */
+function desenharRoleta(){
+  const total = participantes.length || 1;
+  const ang = (2*Math.PI)/total;
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  participantes.forEach((nome,i)=>{
+    ctx.beginPath();
+    ctx.fillStyle = cores[i % cores.length];
+    ctx.moveTo(center, center);
+    ctx.arc(center, center, radius, i*ang, (i+1)*ang);
+    ctx.fill();
+
+    ctx.save();
+    ctx.translate(center, center);
+    ctx.rotate(i*ang + ang/2);
+    ctx.fillStyle="#ffffff";
+    ctx.font="bold 18px Arial";
+    ctx.fillText(nome, radius * 0.55, 6);
+    ctx.restore();
+  });
+}
+
+function desenharPonteiro(){
+  ctx.fillStyle="#111827";
+  ctx.beginPath();
+  ctx.moveTo(center, 8);
+  ctx.lineTo(center - 14, 42);
+  ctx.lineTo(center + 14, 42);
+  ctx.closePath();
+  ctx.fill();
+}
+
+/* ================= ITENS ================= */
+const selectItem = document.getElementById("selectItem");
+
+function renderSelectItems(){
+  selectItem.innerHTML = "";
+  itens.forEach((it,i)=>{
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = `${it.nome} (${it.qtd})`;
+    if(it.qtd === 0) opt.disabled = true;
+    selectItem.appendChild(opt);
+  });
+}
+
+/* ================= SORTEIO ================= */
+document.getElementById("btnGirar").onclick = ()=>{
+  if(!participantes.length || !itens.length){
+    alert("Configure o sorteio primeiro.");
+    return;
+  }
+
+  const item = itens[selectItem.value];
+  if(item.qtd === 0) return;
+
+  const DURATION = 3000;
+  const inicio = anguloAtual;
+  const fim = inicio + (5*360) + Math.random()*360;
+  let start = null;
+
+  function animar(ts){
+    if(!start) start = ts;
+    const p = Math.min((ts-start)/DURATION,1);
+    const ease = 1 - Math.pow(1-p,3);
+
+    anguloAtual = inicio + (fim-inicio)*ease;
+
+    ctx.save();
+    ctx.translate(center, center);
+    ctx.rotate(anguloAtual * Math.PI / 180);
+    ctx.translate(-center, -center);
+    desenharRoleta();
+    ctx.restore();
+
+    desenharPonteiro();
+
+    if(p < 1){
+      requestAnimationFrame(animar);
+    } else {
+      finalizar(item);
+    }
+  }
+  requestAnimationFrame(animar);
+};
+
+function finalizar(item){
+  const ang = (anguloAtual % 360 + 360) % 360;
+  const idx = Math.floor((360 - ang) / (360 / participantes.length));
+  const nome = participantes.splice(idx,1)[0];
+
+  item.qtd--;
+
+  vencedores.push({
+    nome,
+    item:item.nome,
+    data:new Date().toLocaleString("pt-BR")
+  });
+
+  document.getElementById("resultado").textContent = nome;
+
+  salvar();
+  renderSelectItems();
+  renderWinners();
+  desenharRoleta();
+  desenharPonteiro();
+}
+
+/* ================= CONFIG ================= */
+document.getElementById("btnConfig").onclick = ()=>{
+  cfgNames.value = baseParticipantes.join("\n");
+  cfgItems.value = itens.map(i=>`${i.nome};${i.qtd}`).join("\n");
+  modal.style.display="flex";
+};
+
+function saveConfig(){
+  baseParticipantes = cfgNames.value.split("\n").map(v=>v.trim()).filter(Boolean);
+  participantes = [...baseParticipantes];
+
+  itens = cfgItems.value.split("\n").map(l=>{
+    const [nome,qtd] = l.split(";");
+    return { nome:nome.trim(), qtd:Number(qtd)||0 };
+  });
+
+  vencedores = [];
+  salvar();
+  renderSelectItems();
+  renderWinners();
+  desenharRoleta();
+  desenharPonteiro();
+  closeModal();
+}
+
+/* ================= RESET ================= */
+document.getElementById("btnReset").onclick = ()=>{
+  if(confirm("Deseja limpar apenas os ganhadores?")){
+    vencedores = [];
+    participantes = [...baseParticipantes];
+    salvar();
+    renderWinners();
+    renderSelectItems();
+    desenharRoleta();
+    desenharPonteiro();
+    document.getElementById("resultado").textContent = "Sorteio resetado";
+  }
+};
+
+/* ================= UTIL ================= */
+function renderWinners(){
+  const div = document.getElementById("winners");
+  div.innerHTML = vencedores.map(v=>
+    `<div class="winner"><span>${v.nome}</span><span>${v.item}</span></div>`
+  ).join("");
+}
+
+function salvar(){
+  localStorage.setItem("baseParticipants",JSON.stringify(baseParticipantes));
+  localStorage.setItem("participants",JSON.stringify(participantes));
+  localStorage.setItem("items",JSON.stringify(itens));
+  localStorage.setItem("winners",JSON.stringify(vencedores));
+}
+
+function closeModal(){
+  modal.style.display="none";
+}
+
+/* ================= EXPORT ================= */
+document.getElementById("btnExport").onclick = ()=>{
+  const csv = ["Nome,Item,Data"].concat(
+    vencedores.map(v=>`${v.nome},${v.item},${v.data}`)
+  ).join("\n");
+
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download = "sorteio.csv";
+  a.click();
+};
+
+/* INIT */
+renderSelectItems();
+desenharRoleta();
+desenharPonteiro();
+renderWinners();
+</script>
+
 </body>
 </html>
